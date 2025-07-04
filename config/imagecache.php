@@ -68,4 +68,8 @@ return [
         'medium' => \Flobbos\LaravelImageCache\Templates\Medium::class,
         // Add more templates here
     ],
+
+    'paths' => [
+        storage_path('app/public/photos'),
+    ],
 ];

@@ -28,14 +28,21 @@ class ImageCache
 
         if ($this->cache->has($key)) {
             $cached = $this->cache->get($key);
-            return $returnObject ? $this->manager->read($cached) : $cached;
+            if ($returnObject) {
+                $stream = fopen('php://temp', 'r+');
+                fwrite($stream, base64_decode($cached));
+                rewind($stream);
+                $image = $this->manager->read($stream);
+                fclose($stream);
+                return $image;
+            }
+            return base64_decode($cached);
         }
 
         $image = $this->manager->read($source);
         $callback($image);
-        $output = $this->encodeImage($image, config('imagecache.format', 'jpg'));
-
-        $this->cache->put($key, $output, $lifetime * 60);
+        $output = (string) $this->encodeImage($image, config('imagecache.format', 'jpg'));
+        $this->cache->put($key, base64_encode($output), now()->addMinutes($lifetime));
 
         return $returnObject ? $image : $output;
     }

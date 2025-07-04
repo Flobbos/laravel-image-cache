@@ -23,7 +23,7 @@ class ImageCacheServiceProvider extends ServiceProvider
 
             $manager = new ImageManager(new $driverClass());
             $store = config('imagecache.store');
-            $cache = $store ? $app['cache']->store($store) : $app['cache'];
+            $cache = $store ? $app['cache']->store($store) : $app['cache']->store();
 
             return new ImageCache($manager, $cache);
         });
@@ -38,8 +38,18 @@ class ImageCacheServiceProvider extends ServiceProvider
 
         // Register dynamic route
         Route::get('/images/{template}/{path}', function ($template, $path) {
-            $fullPath = public_path('images/' . $path);
-            if (!file_exists($fullPath)) {
+            $paths = config('imagecache.paths', []);
+            $fullPath = null;
+
+            foreach ($paths as $basePath) {
+                $candidate = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+                if (file_exists($candidate)) {
+                    $fullPath = $candidate;
+                    break;
+                }
+            }
+
+            if (!$fullPath) {
                 abort(404, 'Image not found');
             }
 

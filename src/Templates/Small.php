@@ -4,7 +4,7 @@ namespace Flobbos\LaravelImageCache\Templates;
 
 use Intervention\Image\Interfaces\ImageInterface;
 
-class Medium
+class Small
 {
     public function build(ImageInterface $image)
     {
