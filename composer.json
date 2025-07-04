@@ -16,10 +16,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Custom\\ImageCache\\ImageCacheServiceProvider"
+                "Flobbos\\LaravelImageCache\\ImageCacheServiceProvider"
             ],
             "aliases": {
-                "ImageCache": "Custom\\ImageCache\\Facades\\ImageCache"
+                "ImageCache": "Flobbos\\LaravelImageCache\\Facades\\ImageCache"
             }
         }
     },
