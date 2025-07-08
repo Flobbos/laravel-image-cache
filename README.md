@@ -86,13 +86,14 @@ Then, register the template in the `config/imagecache.php` file:
 
 The configuration file `config/imagecache.php` allows you to customize:
 
--   Cache lifetime
--   Image processing driver
--   Cache store
--   Default output format
--   Return object behavior
--   Image manipulation templates
--   **Paths to search for images**
+-   **lifetime**: Cache lifetime in minutes.
+-   **driver**: Image processing driver (`gd`, `imagick`, or `vips`).
+-   **store**: Cache store to use (from your Laravel cache config).
+-   **format**: Default output format (e.g., `jpg`, `png`).
+-   **return_obj**: Whether to return an Intervention Image object or a response.
+-   **templates**: Image manipulation templates (see above for custom templates).
+-   **paths**: Directories to search for images (see below).
+-   **route**: The dynamic route name for serving images.
 
 ### Paths
 
@@ -107,6 +108,37 @@ Example from `config/imagecache.php`:
 ```
 
 When a request is made, the package will search these directories for the requested image file in the order listed.
+
+### Dynamic Image Routes
+
+By default, the package registers a dynamic route for serving cached images:
+
+```
+/images/{template}/{path}
+```
+
+-   `template`: The name of the template defined in your configuration.
+-   `path`: The relative path to the image file.
+
+**Example URL:**
+
+```
+http://your-app.test/images/small/example.jpg
+```
+
+#### Customizing the Route
+
+You can change the route prefix by editing the `route` option in `config/imagecache.php`:
+
+```php
+'dynamic_route' => 'images',
+```
+
+For example, setting `'dynamic_route' => 'imgcache'` will make your URLs look like:
+
+```
+http://your-app.test/imgcache/small/example.jpg
+```
 
 ## Requirements
 

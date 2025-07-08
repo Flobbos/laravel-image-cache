@@ -36,8 +36,10 @@ class ImageCacheServiceProvider extends ServiceProvider
             __DIR__ . '/../config/imagecache.php' => config_path('imagecache.php'),
         ], 'config');
 
+        $route = config('imagecache.dynamic_route', 'images');
+
         // Register dynamic route
-        Route::get('/images/{template}/{path}', function ($template, $path) {
+        Route::get('/' . $route . '/{template}/{path}', function ($template, $path) {
             $paths = config('imagecache.paths', []);
             $fullPath = null;
 

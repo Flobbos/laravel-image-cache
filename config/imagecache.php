@@ -69,7 +69,25 @@ return [
         // Add more templates here
     ],
 
+    /*|--------------------------------------------------------------------------
+    | Cache Paths
+    |--------------------------------------------------------------------------
+    |
+    | Define the paths where images are located. These paths will be used to
+    | locate images for caching. 
+    | */
+
     'paths' => [
         storage_path('app/public/photos'),
     ],
+
+    /*|--------------------------------------------------------------------------
+    | Dynamic Route
+    |--------------------------------------------------------------------------
+    |
+    | Define a dynamic route for accessing cached images. The route will use
+    | the template name and image path to generate the cached image.
+    |
+    */
+    'dynamic_route' => 'images',
 ];
