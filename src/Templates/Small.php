@@ -2,12 +2,13 @@
 
 namespace Flobbos\LaravelImageCache\Templates;
 
+use Flobbos\LaravelImageCache\Contracts\TemplateInterface;
 use Intervention\Image\Interfaces\ImageInterface;
 
-class Small
+class Small implements TemplateInterface
 {
-    public function build(ImageInterface $image)
+    public function build(ImageInterface $image): void
     {
-        $image->scale(300, 200); // Example: Resize to 300x200
+        $image->scale(300, 200);
     }
 }

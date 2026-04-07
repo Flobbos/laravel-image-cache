@@ -39,7 +39,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The default format for cached images if not specified.
-    | Options: 'jpg', 'png', 'gif', 'webp', etc.
+    | Options: 'jpg', 'png', 'gif', 'webp', 'avif'.
     |
     */
     'format' => 'jpg',
@@ -59,8 +59,8 @@ return [
     | Templates
     |--------------------------------------------------------------------------
     |
-    | Define image manipulation templates as class names. Each class should
-    | implement a `build` method that accepts an ImageInterface instance.
+    | Define image manipulation templates as class names. Each class must
+    | implement Flobbos\LaravelImageCache\Contracts\TemplateInterface.
     |
     */
     'templates' => [
@@ -69,19 +69,21 @@ return [
         // Add more templates here
     ],
 
-    /*|--------------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
     | Cache Paths
     |--------------------------------------------------------------------------
     |
     | Define the paths where images are located. These paths will be used to
-    | locate images for caching. 
-    | */
-
+    | locate images for caching.
+    |
+    */
     'paths' => [
         storage_path('app/public/photos'),
     ],
 
-    /*|--------------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
     | Dynamic Route
     |--------------------------------------------------------------------------
     |

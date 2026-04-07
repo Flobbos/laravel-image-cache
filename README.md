@@ -6,8 +6,8 @@ Laravel Image Cache is a package that provides an easy-to-use caching mechanism 
 
 -   Cache manipulated images for improved performance.
 -   Support for multiple image drivers: GD, Imagick, and Libvips.
--   Define custom image manipulation templates.
--   Configurable cache lifetime and output formats.
+-   Define custom image manipulation templates via a clean interface.
+-   Configurable cache lifetime and output formats (JPEG, PNG, GIF, WebP, AVIF).
 -   Dynamic routing for serving cached images.
 
 ## Installation
@@ -35,7 +35,7 @@ To use the package, you can define templates in the configuration file and use t
 ```php
 use Flobbos\LaravelImageCache\Facades\ImageCache;
 
-// Example: Apply the "small" template to an image
+// Apply the "small" template to an image
 $cachedImage = ImageCache::template('path/to/image.jpg', 'small');
 ```
 
@@ -48,7 +48,7 @@ The package provides a dynamic route for serving cached images. For example:
 ```
 
 -   `template`: The name of the template defined in the configuration file.
--   `path`: The relative path to the image in the `public/images` directory.
+-   `path`: The relative path to the image in the configured paths.
 
 Example URL:
 
@@ -58,16 +58,17 @@ http://your-app.test/images/small/example.jpg
 
 ### Custom Templates
 
-You can define custom templates by creating a class that implements a `build` method. For example:
+Create a class that implements `TemplateInterface`:
 
 ```php
 namespace App\ImageTemplates;
 
+use Flobbos\LaravelImageCache\Contracts\TemplateInterface;
 use Intervention\Image\Interfaces\ImageInterface;
 
-class CustomTemplate
+class CustomTemplate implements TemplateInterface
 {
-    public function build(ImageInterface $image)
+    public function build(ImageInterface $image): void
     {
         $image->resize(800, 600);
     }
@@ -87,11 +88,11 @@ Then, register the template in the `config/imagecache.php` file:
 The configuration file `config/imagecache.php` allows you to customize:
 
 -   **lifetime**: Cache lifetime in minutes.
--   **driver**: Image processing driver (`gd`, `imagick`, or `vips`).
+-   **driver**: Image processing driver (`gd`, `imagick`, or `libvips`).
 -   **store**: Cache store to use (from your Laravel cache config).
--   **format**: Default output format (e.g., `jpg`, `png`).
+-   **format**: Default output format (`jpg`, `png`, `gif`, `webp`, `avif`).
 -   **return_obj**: Whether to return an Intervention Image object or a response.
--   **templates**: Image manipulation templates (see above for custom templates).
+-   **templates**: Image manipulation templates (must implement `TemplateInterface`).
 -   **paths**: Directories to search for images (see below).
 -   **route**: The dynamic route name for serving images.
 
@@ -131,19 +132,25 @@ http://your-app.test/images/small/example.jpg
 You can change the route prefix by editing the `route` option in `config/imagecache.php`:
 
 ```php
-'dynamic_route' => 'images',
+'dynamic_route' => 'imgcache',
 ```
 
-For example, setting `'dynamic_route' => 'imgcache'` will make your URLs look like:
+This will make your URLs look like:
 
 ```
 http://your-app.test/imgcache/small/example.jpg
 ```
 
+The route is named `imagecache.serve`, so you can also generate URLs with:
+
+```php
+route('imagecache.serve', ['template' => 'small', 'path' => 'example.jpg']);
+```
+
 ## Requirements
 
 -   PHP 8.1 or higher
--   Laravel 10 or higher
+-   Laravel 10, 11, 12, or 13
 -   Intervention Image 3.0 or higher
 
 ## License
