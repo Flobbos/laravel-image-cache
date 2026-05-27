@@ -46,6 +46,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Encoder Quality
+    |--------------------------------------------------------------------------
+    |
+    | Quality (1-100) used when encoding JPEG, WebP, and AVIF output. Set to
+    | null to use the Intervention default. Ignored for PNG and GIF, which
+    | are lossless / palette-based.
+    |
+    */
+    'quality' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Return Object
     |--------------------------------------------------------------------------
     |

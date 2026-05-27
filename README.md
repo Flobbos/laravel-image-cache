@@ -87,14 +87,15 @@ Then, register the template in the `config/imagecache.php` file:
 
 The configuration file `config/imagecache.php` allows you to customize:
 
--   **lifetime**: Cache lifetime in minutes.
+-   **lifetime**: Cache lifetime in minutes. Set to `0` to cache forever.
 -   **driver**: Image processing driver (`gd`, `imagick`, or `libvips`).
 -   **store**: Cache store to use (from your Laravel cache config).
 -   **format**: Default output format (`jpg`, `png`, `gif`, `webp`, `avif`).
--   **return_obj**: Whether to return an Intervention Image object or a response.
+-   **quality**: Encoder quality (1–100) for JPEG/WebP/AVIF. `null` uses Intervention defaults.
+-   **return_object**: Whether to return an Intervention Image object or the encoded bytes.
 -   **templates**: Image manipulation templates (must implement `TemplateInterface`).
 -   **paths**: Directories to search for images (see below).
--   **route**: The dynamic route name for serving images.
+-   **dynamic_route**: The URL prefix for the dynamic image route.
 
 ### Paths
 
@@ -147,9 +148,16 @@ The route is named `imagecache.serve`, so you can also generate URLs with:
 route('imagecache.serve', ['template' => 'small', 'path' => 'example.jpg']);
 ```
 
+## Security
+
+The dynamic route resolves the requested image against the configured `paths`
+using `realpath()` and refuses any request whose canonical path escapes the
+configured base directories. Path traversal attempts (e.g. `../../etc/passwd`)
+return a 404.
+
 ## Requirements
 
--   PHP 8.1 or higher
+-   PHP 8.2 or higher
 -   Laravel 10, 11, 12, or 13
 -   Intervention Image 3.0 or higher
 

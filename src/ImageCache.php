@@ -3,20 +3,18 @@
 namespace Flobbos\LaravelImageCache;
 
 use Closure;
+use Flobbos\LaravelImageCache\Support\Format;
 use Illuminate\Cache\Repository as Cache;
-use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
+use Intervention\Image\ImageManager;
 use InvalidArgumentException;
 
 class ImageCache
 {
-    protected ImageManager $manager;
-    protected Cache $cache;
-
-    public function __construct(ImageManager $manager, Cache $cache)
-    {
-        $this->manager = $manager;
-        $this->cache = $cache;
+    public function __construct(
+        protected ImageManager $manager,
+        protected Cache $cache,
+    ) {
     }
 
     /**
@@ -24,28 +22,28 @@ class ImageCache
      */
     public function cache(string $source, Closure $callback, ?int $lifetime = null, ?bool $returnObject = null, ?string $templateName = null): ImageInterface|string
     {
-        $lifetime = $lifetime ?? config('imagecache.lifetime', 10);
-        $returnObject = $returnObject ?? config('imagecache.return_object', false);
+        $lifetime = $lifetime ?? (int) config('imagecache.lifetime', 10);
+        $returnObject = $returnObject ?? (bool) config('imagecache.return_object', false);
 
         $key = $this->generateCacheKey($source, $templateName);
 
-        if ($this->cache->has($key)) {
-            $cached = $this->cache->get($key);
+        $cached = $this->cache->get($key);
 
-            if ($returnObject) {
-                return $this->manager->read($cached);
-            }
-
-            return $cached;
+        if ($cached !== null) {
+            return $returnObject ? $this->manager->read($cached) : $cached;
         }
 
         $image = $this->manager->read($source);
         $callback($image);
 
-        $format = config('imagecache.format', 'jpg');
+        $format = Format::normalize((string) config('imagecache.format', 'jpg'));
         $output = (string) $this->encodeImage($image, $format);
 
-        $this->cache->put($key, $output, now()->addMinutes($lifetime));
+        if ($lifetime <= 0) {
+            $this->cache->forever($key, $output);
+        } else {
+            $this->cache->put($key, $output, now()->addMinutes($lifetime));
+        }
 
         return $returnObject ? $image : $output;
     }
@@ -55,14 +53,13 @@ class ImageCache
      */
     public function template(string $source, string $templateName, ?int $lifetime = null, ?bool $returnObject = null): ImageInterface|string
     {
-        $templates = config('imagecache.templates', []);
+        $templates = (array) config('imagecache.templates', []);
 
         if (! isset($templates[$templateName])) {
             throw new InvalidArgumentException("Template '{$templateName}' not found.");
         }
 
-        $templateClass = $templates[$templateName];
-        $template = app($templateClass);
+        $template = app($templates[$templateName]);
 
         return $this->cache($source, function (ImageInterface $image) use ($template): void {
             $template->build($image);
@@ -86,16 +83,18 @@ class ImageCache
     }
 
     /**
-     * Encode an image to the specified format.
+     * Encode an image to the specified format using the configured quality.
      */
     protected function encodeImage(ImageInterface $image, string $format): mixed
     {
+        $quality = config('imagecache.quality');
+
         return match ($format) {
             'png' => $image->toPng(),
             'gif' => $image->toGif(),
-            'webp' => $image->toWebp(),
-            'avif' => $image->toAvif(),
-            default => $image->toJpeg(),
+            'webp' => $quality !== null ? $image->toWebp($quality) : $image->toWebp(),
+            'avif' => $quality !== null ? $image->toAvif($quality) : $image->toAvif(),
+            default => $quality !== null ? $image->toJpeg($quality) : $image->toJpeg(),
         };
     }
 }
