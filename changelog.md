@@ -1,18 +1,32 @@
 ## Version History
 
-### Unreleased
+### v2.0.0
 
--   **Security**: Dynamic route now refuses path traversal — resolved paths must stay within a configured base directory.
--   **Fix**: `lifetime = 0` now caches forever instead of expiring immediately.
--   **Fix**: Removed `has()` + `get()` race condition; a single `get()` + null check is used instead.
--   **Improvement**: Dynamic route is now an invokable controller (`ServeImageController`), so `php artisan route:cache` works.
--   **Improvement**: Cached responses now send `Cache-Control`, `Last-Modified`, and `ETag` headers.
--   **Improvement**: New `quality` config option for JPEG/WebP/AVIF encoders.
--   **Improvement**: Format / MIME-type mapping centralized in `Support\Format` (no more duplication).
--   **Improvement**: Container binding `imagecache` is aliased to the `ImageCache` class for constructor injection.
--   **DX**: Added PHPUnit + Testbench test suite and GitHub Actions CI matrix (PHP 8.2–8.4 × Laravel 10–13).
--   **DX**: Bumped minimum PHP to `^8.2` (required by Laravel 11+ anyway).
--   **Docs**: Fixed README drift (`return_obj` → `return_object`, `route` → `dynamic_route`).
+**Breaking**
+
+-   Minimum PHP version bumped from `^8.1` to `^8.2`. This only affects Laravel 10 consumers running on PHP 8.1; Laravel 11+ already required 8.2.
+
+**Security**
+
+-   Dynamic route now refuses path traversal — resolved paths must stay within a configured base directory. Previously, a crafted URL could read files outside the configured `paths`. Upgrading is recommended.
+
+**Fixes**
+
+-   `lifetime = 0` now caches forever instead of expiring immediately.
+-   Removed `has()` + `get()` race condition; a single `get()` + null check is used instead.
+
+**Improvements**
+
+-   Dynamic route is now an invokable controller (`ServeImageController`), so `php artisan route:cache` works.
+-   Cached responses now send `Cache-Control`, `Last-Modified`, and `ETag` headers.
+-   New `quality` config option for JPEG/WebP/AVIF encoders.
+-   Format / MIME-type mapping centralized in `Support\Format` (no more duplication).
+-   Container binding `imagecache` is aliased to the `ImageCache` class for constructor injection.
+
+**DX**
+
+-   Added PHPUnit + Testbench test suite and GitHub Actions CI matrix (PHP 8.2–8.4 × Laravel 10–13).
+-   Fixed README drift (`return_obj` → `return_object`, `route` → `dynamic_route`) and added a supported-versions matrix.
 
 ### v1.0.0
 
