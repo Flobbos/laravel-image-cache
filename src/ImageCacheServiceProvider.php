@@ -2,6 +2,7 @@
 
 namespace Flobbos\LaravelImageCache;
 
+use Flobbos\LaravelImageCache\Http\Controllers\ServeImageController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
@@ -34,6 +35,8 @@ class ImageCacheServiceProvider extends ServiceProvider
 
             return new ImageCache($manager, $cache);
         });
+
+        $this->app->alias('imagecache', ImageCache::class);
     }
 
     public function boot(): void
@@ -49,38 +52,7 @@ class ImageCacheServiceProvider extends ServiceProvider
     {
         $route = config('imagecache.dynamic_route', 'images');
 
-        Route::get('/' . $route . '/{template}/{path}', function (string $template, string $path) {
-            $paths = config('imagecache.paths', []);
-            $fullPath = null;
-
-            foreach ($paths as $basePath) {
-                $candidate = rtrim($basePath, DIRECTORY_SEPARATOR)
-                    . DIRECTORY_SEPARATOR
-                    . ltrim($path, DIRECTORY_SEPARATOR);
-
-                if (file_exists($candidate)) {
-                    $fullPath = $candidate;
-                    break;
-                }
-            }
-
-            if (! $fullPath) {
-                abort(404, 'Image not found.');
-            }
-
-            $image = app('imagecache')->template($fullPath, $template);
-
-            $format = config('imagecache.format', 'jpg');
-            $mime = match ($format) {
-                'png' => 'image/png',
-                'gif' => 'image/gif',
-                'webp' => 'image/webp',
-                'avif' => 'image/avif',
-                default => 'image/jpeg',
-            };
-
-            return response($image)->header('Content-Type', $mime);
-        })
+        Route::get('/' . trim($route, '/') . '/{template}/{path}', ServeImageController::class)
             ->where('path', '.*')
             ->name('imagecache.serve');
     }
