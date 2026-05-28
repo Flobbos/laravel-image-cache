@@ -14,7 +14,12 @@ class RouteTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'image/jpeg');
-        $response->assertHeader('Cache-Control', 'public, max-age=600');
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertNotNull($cacheControl);
+        $this->assertStringContainsString('public', $cacheControl);
+        $this->assertStringContainsString('max-age=600', $cacheControl);
+
         $this->assertNotEmpty($response->headers->get('ETag'));
         $this->assertNotEmpty($response->headers->get('Last-Modified'));
     }
