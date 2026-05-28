@@ -27,6 +27,9 @@ jobs:
           # Laravel 10 dropped before PHP 8.4 was released; skip that combo.
           - laravel: '10.*'
             php: '8.4'
+          # Laravel 13 requires PHP 8.3+.
+          - laravel: '13.*'
+            php: '8.2'
 
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
@@ -43,12 +46,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require \
+          composer require --no-update --no-interaction \
             "illuminate/cache:${{ matrix.laravel }}" \
             "illuminate/support:${{ matrix.laravel }}" \
-            "illuminate/routing:${{ matrix.laravel }}" \
-            "orchestra/testbench:${{ matrix.testbench }}" \
-            --no-interaction --no-update
+            "illuminate/routing:${{ matrix.laravel }}"
+          composer require --dev --no-update --no-interaction \
+            "orchestra/testbench:${{ matrix.testbench }}"
           composer update --prefer-dist --no-interaction --no-progress
 
       - name: Run tests
