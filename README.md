@@ -161,6 +161,17 @@ return a 404.
 -   Laravel 10, 11, 12, or 13
 -   Intervention Image 3.0 or higher
 
+### Supported versions
+
+The package declares broad version constraints, but the actual PHP × Laravel
+matrix exercised in CI is:
+
+| PHP | Laravel 10 | Laravel 11 | Laravel 12 | Laravel 13 |
+| --- | :---: | :---: | :---: | :---: |
+| 8.2 | ✓ | ✓ | ✓ | — (L13 requires PHP 8.3+) |
+| 8.3 | ✓ | ✓ | ✓ | ✓ |
+| 8.4 | — (L10 predates PHP 8.4) | ✓ | ✓ | ✓ |
+
 ## License
 
 This package is open-sourced software licensed under the [MIT license](LICENSE).
